@@ -19,14 +19,15 @@ export default class AutoExpandingTextInput extends PureComponent {
       height: this.props.minHeight,
       maxHeight: this.props.maxHeight || this.props.minHeight * 3
     };
-    
+
     this._onContentSizeChange = this._onContentSizeChange.bind(this)
   }
 
   static propTypes = {
-    onChangeHeight: PropTypes.func.isRequired,
+    onChangeHeight: PropTypes.func,
     minHeight: PropTypes.number.isRequired,
-    maxHeight: PropTypes.number
+    maxHeight: PropTypes.number,
+    withRef: PropTypes.func,
   };
 
   static defaultProps = {};
@@ -40,11 +41,11 @@ export default class AutoExpandingTextInput extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.onRef(this);
+    // this.props.onRef(this);
   }
 
   componentWillUnmount() {
-    this.props.onRef(undefined);
+    // this.props.onRef(undefined);
   }
 
   clear() {
@@ -68,11 +69,18 @@ export default class AutoExpandingTextInput extends PureComponent {
 
   render() {
     let tmpHeight = Math.min(this.state.maxHeight, this.state.height);
+    const {
+        withRef
+    } = this.props
     return (
       <TextInput
-        ref={o => this.Input = o }
+        ref={o => {
+            this.Input = o
+            withRef&&withRef(o)
+        } }
         {...this.props}
         multiline={true}
+        blurOnSubmit={true}
         onContentSizeChange={this._onContentSizeChange}
         style={[styles.default, this.props.style, {height: tmpHeight}]}
       />
@@ -82,9 +90,6 @@ export default class AutoExpandingTextInput extends PureComponent {
 
 const styles = StyleSheet.create({
   default: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    justifyContent: 'center',
     textAlign: 'left'
   }
 });
